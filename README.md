@@ -39,3 +39,7 @@
 10. Save Cart Items
     1. install js-cokkie package
     2. save and retreive cart items in cookies
+11. Create Login Form
+    1. install react hook form
+    2. create input box
+    3. add login button
