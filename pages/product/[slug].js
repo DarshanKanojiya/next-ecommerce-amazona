@@ -9,6 +9,7 @@ import { Store } from '../../utils/Store';
 const ProductScreen = () => {
   const { state, dispatch } = useContext(Store);
   const { query } = useRouter();
+  const router = useRouter();
   const { slug } = query;
   const product = data.products.find((x) => x.slug === slug);
   if (!product) {
@@ -28,6 +29,7 @@ const ProductScreen = () => {
         quantity,
       },
     });
+    router.push('/cart');
   };
   return (
     <Layout title={product.name}>
