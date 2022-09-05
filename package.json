@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
+    "@types/react": "^18.0.18",
+    "js-cookie": "^3.0.1",
     "next": "12.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0"
