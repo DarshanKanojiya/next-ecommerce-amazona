@@ -37,5 +37,5 @@
    1. add select box for quantity
    2. handle select box change
 10. Save Cart Items
-11. install js-cokkie package
-12. save and retreive cart items in cookies
+    1. install js-cokkie package
+    2. save and retreive cart items in cookies
