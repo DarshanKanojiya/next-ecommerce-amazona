@@ -6,8 +6,9 @@ import { signIn, useSession } from 'next-auth/react';
 import { getError } from '../utils/error';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
-const LoginScreen = () => {
+const RegisterScreen = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const { redirect } = router.query;
@@ -20,9 +21,15 @@ const LoginScreen = () => {
     handleSubmit,
     register,
     formState: { errors },
+    getValues,
   } = useForm();
-  const submitHandler = async ({ email, password }) => {
+  const submitHandler = async ({ name, email, password }) => {
     try {
+      await axios.post('/api/auth/signup', {
+        name,
+        email,
+        password,
+      });
       const result = await signIn('credentials', {
         redirect: false,
         email,
@@ -43,6 +50,19 @@ const LoginScreen = () => {
       >
         <h1 className="mb-4 text-xl">Login</h1>
         <div className="mb-4">
+          <label htmlFor="name">Name</label>
+          <input
+            type="text"
+            className="w-full"
+            id="name"
+            autoFocus
+            {...register('name', { required: 'Please enter name' })}
+          />
+          {errors.name && (
+            <div className="text-red-500">{errors.name.message}</div>
+          )}
+        </div>
+        <div className="mb-4">
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -55,7 +75,6 @@ const LoginScreen = () => {
             })}
             className="w-full"
             id="email"
-            autoFocus
           ></input>
           {errors.email && (
             <div className="text-red-500">{errors.email.message}</div>
@@ -81,7 +100,31 @@ const LoginScreen = () => {
           )}
         </div>
         <div className="mb-4">
-          <button className="primary-button">Login</button>
+          <label htmlFor="confirmPassword">Password</label>
+          <input
+            type="password"
+            {...register('confirmPassword', {
+              required: 'Please enter confirm password',
+              validate: (value) => value === getValues('password'),
+              minLength: {
+                value: 6,
+                message: 'confirm password is more than 5 chars',
+              },
+            })}
+            className="w-full"
+            id="confirmPassword"
+            autoFocus
+          ></input>
+          {errors.confirmPassword && (
+            <div className="text-red-500">{errors.confirmPassword.message}</div>
+          )}
+          {errors.confirmPassword &&
+            errors.confirmPassword.type === 'validate' && (
+              <div className="text-red-500">Password do not match</div>
+            )}
+        </div>
+        <div className="mb-4">
+          <button className="primary-button">Register</button>
         </div>
         <div className="mb-4">
           Don&apos;t have an account? &nbsp;
@@ -92,4 +135,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default RegisterScreen;
