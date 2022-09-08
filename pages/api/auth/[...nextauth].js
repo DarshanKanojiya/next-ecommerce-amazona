@@ -8,7 +8,7 @@ export default NextAuth({
   session: {
     strategy: 'jwt',
   },
-  callback: {
+  callbacks: {
     async jwt({ token, user }) {
       if (user?.id) token._id = user._id;
       if (user?.admin) token.isAdmin = user.isAdmin;
