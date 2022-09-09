@@ -51,7 +51,6 @@ const OrderScreen = () => {
         dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
       }
     };
-    debugger;
     if (!order._id || successPay || (order._id && order._id !== orderId)) {
       fetchOrder();
       if (successPay) {
