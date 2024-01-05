@@ -18,7 +18,7 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
@@ -26,7 +26,7 @@ a {
     color: white;
     background: black;
   }
-}
+} */
 
 .card {
   @apply mb-5 block rounded-lg border border-gray-200 shadow-md;
@@ -51,4 +51,11 @@ textarea {
 }
 .alert-success {
   @apply my-3 rounded-lg bg-red-100 p-3 text-green-700;
+}
+
+.my-card-element {
+  /* Your styles here */
+  border: 1px solid #cccccc;
+  padding: 10px;
+  border-radius: 4px;
 }

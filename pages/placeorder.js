@@ -1,17 +1,19 @@
-import axios from 'axios';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import React, { useContext, useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
-import CheckoutWizard from '../components/CheckoutWizard';
-import Layout from '../components/Layout';
-import { getError } from '../utils/error';
-import { Store } from '../utils/Store';
-import Cookies from 'js-cookie';
+import axios from "axios";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import CheckoutWizard from "../components/CheckoutWizard";
+import Layout from "../components/Layout";
+import { getError } from "../utils/error";
+import { Store } from "../utils/Store";
+import Cookies from "js-cookie";
+import Stripe from "../components/stripe.js";
 
 const PlaceOrderScreen = () => {
   const { state, dispatch } = useContext(Store);
+  const [stripePopup, setStripedPopup] = useState(false);
   const { cart } = state;
   const { cartItems, shippingAddress, paymentMethod } = cart;
   const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
@@ -24,38 +26,38 @@ const PlaceOrderScreen = () => {
   const router = useRouter();
   useEffect(() => {
     if (!paymentMethod) {
-      router.push('/payment');
+      router.push("/payment");
     }
   }, [paymentMethod, router]);
 
   const [loading, setLoading] = useState(false);
 
   const placeOrderHandler = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.post('/api/orders', {
-        orderItems: cartItems,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        shippingPrice,
-        taxPrice,
-        totalPrice,
-      });
-      setLoading(false);
-      dispatch({ type: 'CART_CLEAR_ITEMS' });
-      Cookies.set(
-        'cart',
-        JSON.stringify({
-          ...cart,
-          cartItems: [],
-        })
-      );
-      router.push(`/order/${data._id}`);
-    } catch (err) {
-      setLoading(false);
-      toast.error(getError(err));
-    }
+    // try {
+    //   setLoading(true);
+    //   const { data } = await axios.post("/api/orders", {
+    //     orderItems: cartItems,
+    //     shippingAddress,
+    //     paymentMethod,
+    //     itemsPrice,
+    //     shippingPrice,
+    //     taxPrice,
+    //     totalPrice,
+    //   });
+    //   setLoading(false);
+    //   dispatch({ type: "CART_CLEAR_ITEMS" });
+    //   Cookies.set(
+    //     "cart",
+    //     JSON.stringify({
+    //       ...cart,
+    //       cartItems: [],
+    //     })
+    //   );
+    //   router.push(`/order/${data._id}`);
+    // } catch (err) {
+    //   setLoading(false);
+    //   toast.error(getError(err));
+    // }
   };
 
   return (
@@ -160,15 +162,16 @@ const PlaceOrderScreen = () => {
                 <li>
                   <button
                     disabled={loading}
-                    onClick={placeOrderHandler}
+                    onClick={() => setStripedPopup(true)}
                     className="primary-button w-full"
                   >
-                    {loading ? 'Loading...' : 'Place Order'}
+                    Checkout
                   </button>
                 </li>
               </ul>
             </div>
           </div>
+          {stripePopup && <Stripe onClose={() => setStripedPopup(false)} />}
         </div>
       )}
     </Layout>
