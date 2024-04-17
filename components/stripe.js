@@ -8,7 +8,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import StripeForm from "./StripeForm";
 const stripePromise = loadStripe(`${process.env.NEXT_PUBLIC_STRIPE_KEY}`);
 
-const Stripe = ({ onClose }) => {
+const Stripe = ({ onClose, successOrder }) => {
   return (
     <div
       id="default-modal"
@@ -25,7 +25,7 @@ const Stripe = ({ onClose }) => {
               data-modal-hide="default-modal"
               onClick={onClose}
             >
-              <svg
+              {/* <svg
                 className="w-3 h-3"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
@@ -39,7 +39,7 @@ const Stripe = ({ onClose }) => {
                   stroke-width="2"
                   d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                 />
-              </svg>
+              </svg> */}
               <span className="sr-only">Close modal</span>
             </button>
           </div>
@@ -53,6 +53,7 @@ const Stripe = ({ onClose }) => {
                     stripe={stripe}
                     elements={elements}
                     onClose={onClose}
+                    successOrder={successOrder}
                   />
                 )}
               </ElementsConsumer>

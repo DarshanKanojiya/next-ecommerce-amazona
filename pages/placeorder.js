@@ -32,32 +32,32 @@ const PlaceOrderScreen = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const placeOrderHandler = async () => {
-    // try {
-    //   setLoading(true);
-    //   const { data } = await axios.post("/api/orders", {
-    //     orderItems: cartItems,
-    //     shippingAddress,
-    //     paymentMethod,
-    //     itemsPrice,
-    //     shippingPrice,
-    //     taxPrice,
-    //     totalPrice,
-    //   });
-    //   setLoading(false);
-    //   dispatch({ type: "CART_CLEAR_ITEMS" });
-    //   Cookies.set(
-    //     "cart",
-    //     JSON.stringify({
-    //       ...cart,
-    //       cartItems: [],
-    //     })
-    //   );
-    //   router.push(`/order/${data._id}`);
-    // } catch (err) {
-    //   setLoading(false);
-    //   toast.error(getError(err));
-    // }
+  const successOrder = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.post("/api/orders", {
+        orderItems: cartItems,
+        shippingAddress,
+        paymentMethod,
+        itemsPrice,
+        shippingPrice,
+        taxPrice,
+        totalPrice,
+      });
+      setLoading(false);
+      dispatch({ type: "CART_CLEAR_ITEMS" });
+      Cookies.set(
+        "cart",
+        JSON.stringify({
+          ...cart,
+          cartItems: [],
+        })
+      );
+      router.push(`/order/${data._id}`);
+    } catch (err) {
+      setLoading(false);
+      toast.error(getError(err));
+    }
   };
 
   return (
@@ -131,6 +131,7 @@ const PlaceOrderScreen = () => {
               </div>
             </div>
           </div>
+        
           <div>
             <div className="card p-5">
               <h2 className="mb-2 text-lg">Order Summary</h2>
@@ -171,7 +172,7 @@ const PlaceOrderScreen = () => {
               </ul>
             </div>
           </div>
-          {stripePopup && <Stripe onClose={() => setStripedPopup(false)} />}
+          {stripePopup && <Stripe successOrder={successOrder} onClose={() => setStripedPopup(false)} />}
         </div>
       )}
     </Layout>

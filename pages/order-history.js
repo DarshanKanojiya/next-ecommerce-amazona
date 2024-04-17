@@ -62,13 +62,11 @@ const OrderHistoryScreen = () => {
                   <td className=" p-5 ">{order.createdAt.substring(0, 10)}</td>
                   <td className=" p-5 ">${order.totalPrice}</td>
                   <td className=" p-5 ">
-                    {order.isPaid
-                      ? `${order.paidAt.substring(0, 10)}`
-                      : 'not paid'}
+                    paid
                   </td>
                   <td className=" p-5 ">
                     {order.isDelivered
-                      ? `${order.deliveredAt.substring(0, 10)}`
+                      ? `${order?.deliveredAt || "not delivered"}`
                       : 'not delivered'}
                   </td>
                   <td className=" p-5 ">

@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 //   onClose: () => void,
 //   handleBrand: any,
 // };
-const StripeForm = ({ stripe, onClose, elements }) => {
+const StripeForm = ({ stripe, onClose, elements, successOrder }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -35,8 +35,9 @@ const StripeForm = ({ stripe, onClose, elements }) => {
     setLoading(false);
     if (result?.error?.message) {
     } else {
-      toast.success("Token created successfully.");
+      toast.success("Your order placed successfully.");
       onClose();
+      successOrder();
     }
   };
 

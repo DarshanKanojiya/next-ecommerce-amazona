@@ -83,6 +83,7 @@ const OrderScreen = () => {
     paidAt,
     isDelivered,
     deliveredAt,
+    createdAt
   } = order;
   const createOrder = (data, actions) => {
     return actions.order
@@ -114,6 +115,18 @@ const OrderScreen = () => {
   const onError = (err) => {
     toast.error(getError(err));
   };
+  const DateFormatTime = (dateTime) => {
+    const date = new Date(dateTime); // Use ISO 8601 format for the date string
+    const formattedDate = date.toLocaleString('en-US', {
+        month: 'short', // Short month name (e.g., "Apr")
+        day: '2-digit', // Two-digit day of the month (e.g., "17")
+        year: 'numeric', // Full year (e.g., "2024")
+        hour: '2-digit', // Two-digit hour (e.g., "03")
+        minute: '2-digit', // Two-digit minute (e.g., "35")
+        hour12: true, // Use 12-hour clock (AM/PM)
+    });
+    return formattedDate;
+};
   return (
     <Layout title={`order ${orderId}`}>
       <h1 className="mb-4 text-xl">{`Order ${orderId}`}</h1>
@@ -144,11 +157,8 @@ const OrderScreen = () => {
             <div className="card p-5">
               <h2 className="mb-2 text-lg">Payment Method</h2>
               <div>{paymentMethod}</div>
-              {isPaid ? (
-                <div className="alert-success">Paid at{paidAt}</div>
-              ) : (
-                <div className="alert-error">Not paid</div>
-              )}
+                <div className="alert-success">Paid at {DateFormatTime(createdAt)}</div>
+              
             </div>
             <div className="card overflow-x-auto p-5">
               <h2 className="mb-2 text-lg">Order Items</h2>
@@ -217,7 +227,7 @@ const OrderScreen = () => {
                     <div>${totalPrice}</div>
                   </div>
                 </li>
-                {!isPaid && (
+                {/* {!isPaid && (
                   <li>
                     {isPending ? (
                       <div>Loading...</div>
@@ -232,7 +242,7 @@ const OrderScreen = () => {
                     )}
                     {loadingPay && <div>Loading...</div>}
                   </li>
-                )}
+                )} */}
               </ul>
             </div>
           </div>
