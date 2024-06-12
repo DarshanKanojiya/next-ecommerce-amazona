@@ -1,14 +1,14 @@
 import React from "react";
 import {
-  CardElement,
   Elements,
   ElementsConsumer,
 } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js/pure";
 import StripeForm from "./StripeForm";
-const stripePromise = loadStripe(`${process.env.NEXT_PUBLIC_STRIPE_KEY}`);
 
-const Stripe = ({ onClose, successOrder }) => {
+const StripeComponent = ({ onClose, successOrder }) => {
+  const stripePromise = loadStripe(`pk_test_aML3dbBcqqH3ntkGlL3fUECy`);
+
   return (
     <div
       id="default-modal"
@@ -25,21 +25,6 @@ const Stripe = ({ onClose, successOrder }) => {
               data-modal-hide="default-modal"
               onClick={onClose}
             >
-              {/* <svg
-                className="w-3 h-3"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 14 14"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                />
-              </svg> */}
               <span className="sr-only">Close modal</span>
             </button>
           </div>
@@ -65,4 +50,4 @@ const Stripe = ({ onClose, successOrder }) => {
   );
 };
 
-export default Stripe;
+export default StripeComponent;
