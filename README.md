@@ -1,3 +1,7 @@
+Admin
+darshan@radixweb.com
+Radixweb8
+
 #NextJs Tailwind Ecommerce Website Like Amazon
 
 ##Lession
