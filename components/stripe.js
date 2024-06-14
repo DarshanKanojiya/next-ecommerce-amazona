@@ -7,8 +7,7 @@ import { loadStripe } from "@stripe/stripe-js/pure";
 import StripeForm from "./StripeForm";
 
 const StripeComponent = ({ onClose, successOrder }) => {
-  const stripePromise = loadStripe(`pk_test_aML3dbBcqqH3ntkGlL3fUECy`);
-
+  const stripePromise = loadStripe(`${process.env.NEXT_PUBLIC_STRIPE_KEY}`);
   return (
     <div
       id="default-modal"
