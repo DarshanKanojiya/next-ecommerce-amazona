@@ -1,76 +1,83 @@
-import axios from "axios";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useContext, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import CheckoutWizard from "../components/CheckoutWizard";
-import Layout from "../components/Layout";
-import { getError } from "../utils/error";
-import { Store } from "../utils/Store";
-import Cookies from "js-cookie";
-import Stripe from "../components/stripe.js";
+import { NextPage } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { useEffect, useReducer } from 'react';
+import axios from 'axios';
+import Layout from '../../components/Layout';
+import { getError } from '../../utils/error';
+import { CustomPageProps, OrderItem } from '../../types';
 
-const PlaceOrderScreen = () => {
-  const { state, dispatch } = useContext(Store);
-  const [stripePopup, setStripedPopup] = useState(false);
-  const { cart } = state;
-  const { cartItems, shippingAddress, paymentMethod } = cart;
-  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100;
-  const itemsPrice = round2(
-    cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
-  );
-  const shippingPrice = itemsPrice > 200 ? 0 : 15;
-  const taxPrice = round2(itemsPrice * 0.15);
-  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
-  const router = useRouter();
+function reducer(state: any, action: any) {
+  switch (action.type) {
+    case 'FETCH_REQUEST':
+      return { ...state, loading: true, error: '' };
+    case 'FETCH_SUCCESS':
+      return { ...state, loading: false, order: action.payload, error: '' };
+    case 'FETCH_FAIL':
+      return { ...state, loading: false, error: action.payload };
+    default:
+      state;
+  }
+}
+
+const OrderScreen: NextPage & CustomPageProps = () => {
+  const { query } = useRouter();
+  const orderId = query.id;
+  const [
+    { loading, error, order },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    order: {},
+    error: '',
+  });
   useEffect(() => {
-    if (!paymentMethod) {
-      router.push("/payment");
-    }
-  }, [paymentMethod, router]);
-
-  const [loading, setLoading] = useState(false);
-
-  const successOrder = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.post("/api/orders", {
-        orderItems: cartItems,
-        shippingAddress,
-        paymentMethod,
-        itemsPrice,
-        shippingPrice,
-        taxPrice,
-        totalPrice,
-      });
-      setLoading(false);
-      dispatch({ type: "CART_CLEAR_ITEMS" });
-      Cookies.set(
-        "cart",
-        JSON.stringify({
-          ...cart,
-          cartItems: [],
-        })
-      );
-      router.push(`/order/${data._id}`);
-    } catch (err) {
-      setLoading(false);
-      toast.error(getError(err));
-    }
+    const fetchOrder = async () => {
+      try {
+        dispatch({ type: 'FETCH_REQUEST' });
+        const { data } = await axios.get(`/api/orders/${orderId}`);
+        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+      } catch (err) {
+        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+      }
+    };
+    fetchOrder();
+  }, []);
+  const {
+    shippingAddress,
+    paymentMethod,
+    orderItems,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+    isDelivered,
+    deliveredAt,
+    createdAt
+  } = order;
+  const DateFormatTime = (dateTime: string) => {
+    const date = new Date(dateTime);
+    const formattedDate = date.toLocaleString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+    return formattedDate;
   };
-
   return (
-    <Layout title="Place Order">
-      <CheckoutWizard activeStep={3} />
-      <h1 className="mb-4 text-xl">Place Order</h1>
-      {cartItems.length === 0 ? (
-        <div>
-          Cart is empty. <Link href="/">Go shopping</Link>
-        </div>
+    <Layout title={`order ${orderId}`}>
+      <h1 className="mb-4 text-xl">{`Order ${orderId}`}</h1>
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div className="alert-erro">{error}</div>
       ) : (
         <div className="grid md:grid-cols-4 md:gap-5">
-          <div className="overflow-x-auto md:col-span-3 ">
+          <div className="overflow-x-auto md:col-span-3">
             <div className="card p-5">
               <h2 className="mb-2 text-lg">Shipping Address</h2>
               <div>
@@ -79,15 +86,20 @@ const PlaceOrderScreen = () => {
                 {shippingAddress.country}
               </div>
               <div>
-                <Link href="/shipping">Edit</Link>
+                {isDelivered ? (
+                  <div className="alert-success">
+                    Delivered at {deliveredAt}
+                  </div>
+                ) : (
+                  <div className="alert-error">Not delivered</div>
+                )}
               </div>
             </div>
             <div className="card p-5">
               <h2 className="mb-2 text-lg">Payment Method</h2>
               <div>{paymentMethod}</div>
-              <div>
-                <Link href="/payment">Edit</Link>
-              </div>
+              <div className="alert-success">Paid at {DateFormatTime(createdAt)}</div>
+
             </div>
             <div className="card overflow-x-auto p-5">
               <h2 className="mb-2 text-lg">Order Items</h2>
@@ -101,7 +113,7 @@ const PlaceOrderScreen = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {cartItems.map((item) => (
+                  {orderItems.map((item: OrderItem) => (
                     <tr key={item._id} className="border-b">
                       <td>
                         <Link href={`/product/${item.slug}`}>
@@ -126,12 +138,8 @@ const PlaceOrderScreen = () => {
                   ))}
                 </tbody>
               </table>
-              <div>
-                <Link href="/cart">Edit</Link>
-              </div>
             </div>
           </div>
-        
           <div>
             <div className="card p-5">
               <h2 className="mb-2 text-lg">Order Summary</h2>
@@ -160,25 +168,14 @@ const PlaceOrderScreen = () => {
                     <div>${totalPrice}</div>
                   </div>
                 </li>
-                <li>
-                  <button
-                    disabled={loading}
-                    onClick={() => setStripedPopup(true)}
-                    className="primary-button w-full"
-                  >
-                    Checkout
-                  </button>
-                </li>
               </ul>
             </div>
           </div>
-          {stripePopup && <Stripe successOrder={successOrder} onClose={() => setStripedPopup(false)} />}
         </div>
       )}
     </Layout>
   );
 };
 
-export default PlaceOrderScreen;
-
-PlaceOrderScreen.auth = true;
+export default OrderScreen;
+OrderScreen.auth = true;

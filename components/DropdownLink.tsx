@@ -1,8 +1,9 @@
+import { NextPage } from 'next';
 import React from 'react';
 import Link from 'next/link';
+import { DropdownLinkProps } from '../types';
 
-const DropdownLink = (props) => {
-  let { href, children, ...rest } = props;
+const DropdownLink: NextPage<DropdownLinkProps> = ({ href, children, ...rest }) => {
   return (
     <Link href={href}>
       <a {...rest}>{children}</a>

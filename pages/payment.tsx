@@ -1,3 +1,4 @@
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -5,14 +6,15 @@ import Cookies from "js-cookie";
 import CheckoutWizard from "../components/CheckoutWizard";
 import Layout from "../components/Layout";
 import { Store } from "../utils/Store";
+import { CustomPageProps } from "../types";
 
-const PaymentScreen = () => {
+const PaymentScreen: NextPage & CustomPageProps = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState();
   const { state, dispatch } = useContext(Store);
   const { cart } = state;
   const { shippingAddress, paymentMethod } = cart;
   const router = useRouter();
-  const submitHandler = (e) => {
+  const submitHandler = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedPaymentMethod) {
       return toast.error("Payment method is required");
@@ -28,18 +30,22 @@ const PaymentScreen = () => {
     router.push("/placeorder");
   };
   useEffect(() => {
-    if (!shippingAddress.address) {
-      return router.push("/shipping");
-    }
+    const redirectToShipping = async () => {
+      if (!shippingAddress.address) {
+        await router.push("/shipping");
+      }
+    };
+    redirectToShipping();
     setSelectedPaymentMethod(paymentMethod || "");
   }, [paymentMethod, router, shippingAddress.address]);
+  
   return (
     <div>
       <Layout title="Payment Method">
         <CheckoutWizard activeStep={2} />
         <form className="mx-auto max-w-screen-md" onSubmit={submitHandler}>
           <h1 className="mb-4 text-xl">Payment Method</h1>
-          {["Stripe"].map((payment) => (
+          {["Stripe"].map((payment: any) => (
             <div key={payment} className="mb-4">
               <input
                 name="paymentMethod"

@@ -1,6 +1,8 @@
+import { NextPage } from 'next';
 import React from 'react';
+import { CheckoutWizardProps } from '../types';
 
-const CheckoutWizard = ({ activeStep = 0 }) => {
+const CheckoutWizard : NextPage<CheckoutWizardProps> = ({ activeStep = 0 }) => {
   return (
     <div className="mb-5 flex flex-wrap">
       {['User Login', 'Shipping Address', 'Payment Method', 'Place Order'].map(

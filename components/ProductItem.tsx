@@ -1,7 +1,9 @@
+import { NextPage } from 'next';
 import Link from 'next/link';
 import React from 'react';
+import { ProductItemProps } from '../types';
 
-const ProductItem = ({ product, addToCartHandler }) => {
+const ProductItem : NextPage<ProductItemProps> = ({ product, addToCartHandler }) => {
   return (
     <div className="card">
       <Link href={`product/${product.slug}`}>

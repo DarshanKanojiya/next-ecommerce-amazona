@@ -1,24 +1,24 @@
-import axios from 'axios';
+import { NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import Layout from '../../components/Layout';
 import Product from '../../models/product';
-import data from '../../utils/data';
 import db from '../../utils/db';
 import { Store } from '../../utils/Store';
+import { ProductProps } from '../../types';
 
-const ProductScreen = (props) => {
-  const { product } = props;
+const ProductScreen: NextPage<{ product: ProductProps }> = ({ product }) => {
   const { state, dispatch } = useContext(Store);
   const router = useRouter();
   if (!product) {
     return <Layout title="Product Not Found">Product Not Found</Layout>;
   }
   const addToCartHandler = async () => {
-    const existItem = state.cart.cartItems.find((x) => x.slug === product.slug);
+    const existItem = state.cart.cartItems.find((x:any) => x.slug === product.slug);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
     if (data.countInStock < quantity) {
@@ -84,7 +84,7 @@ const ProductScreen = (props) => {
   );
 };
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: any) {
   const { params } = context;
   const { slug } = params;
   await db.connect();

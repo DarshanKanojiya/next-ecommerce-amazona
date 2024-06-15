@@ -1,12 +1,14 @@
+import { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import React, { useContext, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import Cookies from 'js-cookie';
 import CheckoutWizard from '../components/CheckoutWizard';
 import Layout from '../components/Layout';
 import { Store } from '../utils/Store';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/router';
+import { CustomPageProps, ShippingFormDataProps } from '../types';
 
-const Shipping = () => {
+const Shipping: NextPage & CustomPageProps = () => {
   const router = useRouter();
   const {
     handleSubmit,
@@ -14,7 +16,7 @@ const Shipping = () => {
     formState: { errors },
     setValue,
     getValues,
-  } = useForm();
+  } = useForm<ShippingFormDataProps>();
   const { state, dispatch } = useContext(Store);
   const { cart } = state;
   const { shippingAddress } = cart;
@@ -25,7 +27,8 @@ const Shipping = () => {
     setValue('postalCode', shippingAddress.postalCode);
     setValue('country', shippingAddress.country);
   }, [setValue, shippingAddress]);
-  const submitHandler = ({ fullName, address, city, postalCode, country }) => {
+
+  const submitHandler: SubmitHandler<ShippingFormDataProps> = ({ fullName, address, city, postalCode, country }) => {
     dispatch({
       type: 'SAVE_SHIPPING_ADDRESS',
       payload: { fullName, address, city, postalCode, country },
@@ -45,6 +48,7 @@ const Shipping = () => {
     );
     router.push('/payment');
   };
+
   return (
     <Layout title="Shipping Address">
       <CheckoutWizard activeStep={1} />

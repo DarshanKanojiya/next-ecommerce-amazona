@@ -1,3 +1,4 @@
+import { NextPage } from "next";
 import React from "react";
 import {
   Elements,
@@ -5,8 +6,9 @@ import {
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js/pure";
 import StripeForm from "./StripeForm";
+import { StripeProps } from "../types";
 
-const StripeComponent = ({ onClose, successOrder }) => {
+const Stripe: NextPage<StripeProps> = ({ onClose, successOrder }) => {
   const stripePromise = loadStripe(`${process.env.NEXT_PUBLIC_STRIPE_KEY}`);
   return (
     <div
@@ -33,7 +35,6 @@ const StripeComponent = ({ onClose, successOrder }) => {
               <ElementsConsumer>
                 {({ stripe, elements }) => (
                   <StripeForm
-                    handleBrand={() => {}}
                     stripe={stripe}
                     elements={elements}
                     onClose={onClose}
@@ -49,4 +50,4 @@ const StripeComponent = ({ onClose, successOrder }) => {
   );
 };
 
-export default StripeComponent;
+export default Stripe;

@@ -1,40 +1,48 @@
+import { NextPage } from 'next';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import Layout from '../components/Layout';
 import { signIn, useSession } from 'next-auth/react';
-import { getError } from '../utils/error';
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+import React, { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import Layout from '../components/Layout';
+import { getError } from '../utils/error';
+import { LoginForm } from '../types';
 
-const LoginScreen = () => {
+const LoginScreen: NextPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const { redirect } = router.query;
+  const { redirect } = router.query as { redirect?: string };
+
   useEffect(() => {
     if (session?.user) {
       router.push(redirect || '/');
     }
   }, [router, session, redirect]);
+
   const {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm();
-  const submitHandler = async ({ email, password }) => {
+  } = useForm<LoginForm>();
+
+  const submitHandler: SubmitHandler<LoginForm> = async ({ email, password }) => {
     try {
       const result = await signIn('credentials', {
         redirect: false,
         email,
         password,
       });
-      if (result.error) {
-        toast.error(result.error);
+      if (result) {
+        if (result.error) {
+          toast.error(result.error);
+        }
       }
     } catch (err) {
       toast.error(getError(err));
     }
   };
+
   return (
     <Layout title="login">
       <form
@@ -56,7 +64,7 @@ const LoginScreen = () => {
             className="w-full"
             id="email"
             autoFocus
-          ></input>
+          />
           {errors.email && (
             <div className="text-red-500">{errors.email.message}</div>
           )}
@@ -69,13 +77,12 @@ const LoginScreen = () => {
               required: 'Please enter password',
               minLength: {
                 value: 6,
-                message: 'password is more than 5 chars',
+                message: 'Password must be at least 6 characters long',
               },
             })}
             className="w-full"
             id="password"
-            autoFocus
-          ></input>
+          />
           {errors.password && (
             <div className="text-red-500">{errors.password.message}</div>
           )}
@@ -85,7 +92,9 @@ const LoginScreen = () => {
         </div>
         <div className="mb-4">
           Don&apos;t have an account? &nbsp;
-          <Link href={`/register?redirect=${redirect || '/'}`}>Register</Link>
+          <Link href={`/register?redirect=${encodeURIComponent(redirect || '/')}`}>
+            Register
+          </Link>
         </div>
       </form>
     </Layout>

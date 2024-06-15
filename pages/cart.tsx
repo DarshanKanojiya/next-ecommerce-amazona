@@ -1,26 +1,29 @@
+import { NextPage } from 'next';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 import React, { useContext } from 'react';
 import Layout from '../components/Layout';
 import { Store } from '../utils/Store';
 import { XCircleIcon } from '@heroicons/react/outline';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
-import dynamic from 'next/dynamic';
-import axios from 'axios';
 import { toast } from 'react-toastify';
-const CartScreen = () => {
+import { CartItemProps } from '../types';
+
+const CartScreen: NextPage = () => {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const {
     cart: { cartItems },
   } = state;
-  const removeCartHander = (item) => {
+  const removeCartHandel = (item: any) => {
     dispatch({
       type: 'CART_REMOVE_ITEM',
       payload: item,
     });
   };
-  const updateCartHandler = async (item, qty) => {
+  const updateCartHandler = async (item: { _id: any; }, qty: string) => {
     const quantity = Number(qty);
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
@@ -55,7 +58,7 @@ const CartScreen = () => {
                 </tr>
               </thead>
               <tbody>
-                {cartItems.map((item) => (
+                {cartItems.map((item: CartItemProps) => (
                   <tr key={item.slug} className="border-b">
                     <td>
                       <Link href={`/product/${item.slug}`}>
@@ -78,16 +81,16 @@ const CartScreen = () => {
                           updateCartHandler(item, e.target.value)
                         }
                       >
-                        {[...Array(item.countInStock).keys()].map((x) => (
-                          <option key={x + 1} value={x + 1}>
-                            {x + 1}
+                        {Array.from({ length: item.countInStock }, (_, index) => (
+                          <option key={index + 1} value={index + 1}>
+                            {index + 1}
                           </option>
                         ))}
                       </select>
                     </td>
                     <td className="p-5 text-right">${item.price}</td>
                     <td className="p-5 text-center">
-                      <button onClick={() => removeCartHander(item)}>
+                      <button onClick={() => removeCartHandel(item)}>
                         <XCircleIcon className="h-5 w-5"></XCircleIcon>
                       </button>
                     </td>
@@ -100,8 +103,8 @@ const CartScreen = () => {
             <ul>
               <li>
                 <div className="pb-3 text-xl">
-                  Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}) : $
-                  {cartItems.reduce((a, c) => a + c.quantity * c.price, 0)}
+                  Subtotal ({cartItems.reduce((a: any, c: { quantity: any; }) => a + c.quantity, 0)}) : $
+                  {cartItems.reduce((a: number, c: { quantity: number; price: number; }) => a + c.quantity * c.price, 0)}
                 </div>
               </li>
               <li>

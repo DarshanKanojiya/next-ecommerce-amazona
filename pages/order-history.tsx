@@ -1,10 +1,17 @@
-import axios from 'axios';
+import { NextPage } from 'next';
 import Link from 'next/link';
 import React, { useEffect, useReducer } from 'react';
+import axios from 'axios';
 import Layout from '../components/Layout';
 import { getError } from '../utils/error';
+import { CustomPageProps, OrderProps, OrderStateProps } from '../types';
 
-function reducer(state, action) {
+type Action =
+  | { type: 'FETCH_REQUEST' }
+  | { type: 'FETCH_SUCCESS'; payload: OrderProps[] }
+  | { type: 'FETCH_FAIL'; payload: string };
+
+function reducer(state: OrderStateProps, action: Action): OrderStateProps {
   switch (action.type) {
     case 'FETCH_REQUEST':
       return { ...state, loading: true, error: '' };
@@ -16,7 +23,8 @@ function reducer(state, action) {
       return state;
   }
 }
-const OrderHistoryScreen = () => {
+
+const OrderHistoryScreen: NextPage & CustomPageProps = () => {
   const [{ loading, error, orders }, dispatch] = useReducer(reducer, {
     loading: true,
     orders: [],

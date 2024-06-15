@@ -1,16 +1,17 @@
-import axios from 'axios';
+import { NextPage } from 'next';
 import { useContext } from 'react';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 import Layout from '../components/Layout';
 import ProductItem from '../components/ProductItem';
 import Product from '../models/product';
 import db from '../utils/db';
 import { Store } from '../utils/Store';
-import { toast } from 'react-toastify';
 
-export default function Home({ products }) {
+const Home: NextPage<{ products: any }> = ({ products }) => {
   const { state, dispatch } = useContext(Store);
-  const addToCartHandler = async (product) => {
-    const existItem = state.cart.cartItems.find((x) => x.slug === product.slug);
+  const addToCartHandler = async (product: any) => {
+    const existItem = state.cart.cartItems.find((x: any) => x.slug === product.slug);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
     if (data.countInStock < quantity) {
@@ -29,7 +30,7 @@ export default function Home({ products }) {
   return (
     <Layout title="Home Page">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {products.map((product) => (
+        {products.map((product: any) => (
           <ProductItem
             product={product}
             key={product.slug}
@@ -40,6 +41,8 @@ export default function Home({ products }) {
     </Layout>
   );
 }
+
+export default Home;
 
 export async function getServerSideProps() {
   await db.connect();
